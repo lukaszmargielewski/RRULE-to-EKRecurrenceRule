@@ -10,9 +10,15 @@
 
 static NSDateFormatter *dateFormatter = nil;
 
+
 @implementation EKRecurrenceRule (RRULE)
 
 - (EKRecurrenceRule *)initWithString:(NSString *)rfc2445String
+{
+    return [self initWithString:rfc2445String andParseMore:NO];
+}
+
+- (EKRecurrenceRule *)initWithString:(NSString *)rfc2445String andParseMore:(BOOL)more
 {
     // If the date formatter isn't already set up, create it and cache it for reuse.
     if (dateFormatter == nil)
@@ -21,7 +27,7 @@ static NSDateFormatter *dateFormatter = nil;
         NSLocale *enUSPOSIXLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
         
         [dateFormatter setLocale:enUSPOSIXLocale];
-        [dateFormatter setDateFormat:@"yyyyMMdd'T'HHmmss'Z'"];
+        [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSXXX"];
         [dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
     }
     
@@ -54,13 +60,13 @@ static NSDateFormatter *dateFormatter = nil;
         }
     
         // Interval
-        if ([component isEqualToString:@"INTERVAL"])
+        else if ([component isEqualToString:@"INTERVAL"])
         {
             interval = [[components objectAtIndex:++i] intValue];
         }
         
         // Days of the week
-        if ([component isEqualToString:@"BYDAY"])
+        else if ([component isEqualToString:@"BYDAY"])
         {
             daysOfTheWeek = [NSMutableArray array];
             NSArray *dayStrings = [[components objectAtIndex:++i] componentsSeparatedByString:@","];
@@ -86,7 +92,7 @@ static NSDateFormatter *dateFormatter = nil;
         }
         
         // Days of the month
-        if ([component isEqualToString:@"BYMONTHDAY"])
+        else if ([component isEqualToString:@"BYMONTHDAY"])
         {
             daysOfTheMonth = [NSMutableArray array];
             NSArray *dayStrings = [[components objectAtIndex:++i] componentsSeparatedByString:@","];
@@ -97,7 +103,7 @@ static NSDateFormatter *dateFormatter = nil;
         }
         
         // Months of the year
-        if ([component isEqualToString:@"BYMONTH"])
+        else if ([component isEqualToString:@"BYMONTH"])
         {
             monthsOfTheYear = [NSMutableArray array];
             NSArray *monthStrings = [[components objectAtIndex:++i] componentsSeparatedByString:@","];
@@ -108,7 +114,7 @@ static NSDateFormatter *dateFormatter = nil;
         }
         
         // Weeks of the year
-        if ([component isEqualToString:@"BYWEEKNO"])
+        else if ([component isEqualToString:@"BYWEEKNO"])
         {
             weeksOfTheYear = [NSMutableArray array];
             NSArray *weekStrings = [[components objectAtIndex:++i] componentsSeparatedByString:@","];
@@ -119,7 +125,7 @@ static NSDateFormatter *dateFormatter = nil;
         }
         
         // Days of the year
-        if ([component isEqualToString:@"BYYEARDAY"])
+        else if ([component isEqualToString:@"BYYEARDAY"])
         {
             daysOfTheYear = [NSMutableArray array];
             NSArray *dayStrings = [[components objectAtIndex:++i] componentsSeparatedByString:@","];
@@ -130,7 +136,7 @@ static NSDateFormatter *dateFormatter = nil;
         }
         
         // Set positions
-        if ([component isEqualToString:@"BYSETPOS"])
+        else if ([component isEqualToString:@"BYSETPOS"])
         {
             setPositions = [NSMutableArray array];
             NSArray *positionStrings = [[components objectAtIndex:++i] componentsSeparatedByString:@","];
@@ -141,16 +147,29 @@ static NSDateFormatter *dateFormatter = nil;
         }
         
         // RecurrenceEnd
-        if ([component isEqualToString:@"COUNT"])
+        else if ([component isEqualToString:@"COUNT"])
         {
             NSUInteger occurenceCount = [[components objectAtIndex:++i] intValue];
             recurrenceEnd = [EKRecurrenceEnd recurrenceEndWithOccurrenceCount:occurenceCount];
             
-        } else if ([component isEqualToString:@"UNTIL"])
+        }
+        else if ([component isEqualToString:@"UNTIL"])
         {
             NSDate *endDate =  [dateFormatter dateFromString:[components objectAtIndex:++i]];
             recurrenceEnd = [EKRecurrenceEnd recurrenceEndWithEndDate:endDate];
+            
+            if(more)
+                self.endDate = endDate;
         }
+        
+        // Start Date
+        else if ([component isEqualToString:@"DTSTART"])
+        {
+            NSDate *startDate =  [dateFormatter dateFromString:[components objectAtIndex:++i]];
+            
+            self.startDate = startDate;
+        }
+        
     }
     
     return [[EKRecurrenceRule alloc] initRecurrenceWithFrequency:frequency
@@ -162,6 +181,17 @@ static NSDateFormatter *dateFormatter = nil;
                                                    daysOfTheYear:daysOfTheYear
                                                     setPositions:setPositions
                                                              end:recurrenceEnd];
+}
+
+- (EKEvent*)eventWithRecurrenceRuleFromString:(NSString*)rfc2445String;
+{
+    EKRecurrenceRule* newRule = [self initWithString:rfc2445String andParseMore:YES];
+    EKEvent* newEvent = [[EKEvent alloc] init];
+    [newEvent addRecurrenceRule:newRule];
+    newEvent.startDate = self.startDate;
+    newEvent.endDate = self.endDate;
+    
+    return newEvent;
 }
 
 @end
