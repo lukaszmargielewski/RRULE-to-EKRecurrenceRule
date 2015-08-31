@@ -178,7 +178,7 @@ static NSDateFormatter *dateFormatter = nil;
 
     NSMutableString *string = [[NSMutableString alloc] initWithCapacity:200];
     
-    EKRecurrenceFrequency frequency = EKRecurrenceFrequencyDaily;
+    EKRecurrenceFrequency frequency = self.frequency;
     NSInteger interval              = self.interval;
     NSArray *daysOfTheWeek   = self.daysOfTheWeek;
     NSArray *daysOfTheMonth  = self.daysOfTheMonth;
