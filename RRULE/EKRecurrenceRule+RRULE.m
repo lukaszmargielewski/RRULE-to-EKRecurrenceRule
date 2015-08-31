@@ -226,6 +226,11 @@ static NSDateFormatter *dateFormatter = nil;
                 [string appendString:@","];
             }
             
+            NSInteger weekNumber = dayOfTheWeek.weekNumber;
+            
+            if (weekNumber > 0) {
+                [string appendFormat:@"%li", (long)weekNumber];
+            }
             switch (dayOfWeek) {
                 case EKSunday:
                 [string appendString:@"SU"];
@@ -250,8 +255,7 @@ static NSDateFormatter *dateFormatter = nil;
                 break;
             }
             
-            // TODO: Add weekNumber support!
-            NSInteger weekNumber = dayOfTheWeek.weekNumber;
+            
             
             
             i++;
