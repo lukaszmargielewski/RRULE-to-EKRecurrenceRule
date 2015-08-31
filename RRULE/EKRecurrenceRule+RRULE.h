@@ -15,5 +15,6 @@
 // - EKRecurrenceRule does only support DAILY, WEEKLY, MONTHLY, YEARLY frequencies
 
 - (EKRecurrenceRule *)initWithString:(NSString *)rfc2445String;
+- (NSString *)rfc2445String;
 
 @end

@@ -12,8 +12,7 @@ static NSDateFormatter *dateFormatter = nil;
 
 @implementation EKRecurrenceRule (RRULE)
 
-- (EKRecurrenceRule *)initWithString:(NSString *)rfc2445String
-{
+- (EKRecurrenceRule *)initWithString:(NSString *)rfc2445String{
     // If the date formatter isn't already set up, create it and cache it for reuse.
     if (dateFormatter == nil)
     {
@@ -162,6 +161,232 @@ static NSDateFormatter *dateFormatter = nil;
                                                    daysOfTheYear:daysOfTheYear
                                                     setPositions:setPositions
                                                              end:recurrenceEnd];
+}
+
+- (NSString *)rfc2445String{
+    // If the date formatter isn't already set up, create it and cache it for reuse.
+    if (dateFormatter == nil)
+    {
+        dateFormatter = [[NSDateFormatter alloc] init];
+        NSLocale *enUSPOSIXLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+        
+        [dateFormatter setLocale:enUSPOSIXLocale];
+        [dateFormatter setDateFormat:@"yyyyMMdd'T'HHmmss'Z'"];
+        [dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+    }
+    
+
+    NSMutableString *string = [[NSMutableString alloc] initWithCapacity:200];
+    
+    EKRecurrenceFrequency frequency = EKRecurrenceFrequencyDaily;
+    NSInteger interval              = self.interval;
+    NSArray *daysOfTheWeek   = self.daysOfTheWeek;
+    NSArray *daysOfTheMonth  = self.daysOfTheMonth;
+    NSArray *monthsOfTheYear = self.monthsOfTheYear;
+    NSArray *daysOfTheYear   = self.daysOfTheYear;
+    NSArray *weeksOfTheYear  = self.weeksOfTheYear;
+    NSArray *setPositions    = self.setPositions;
+    
+    EKRecurrenceEnd *recurrenceEnd  = self.recurrenceEnd;
+    
+    // Frequency:
+    switch (frequency) {
+        case EKRecurrenceFrequencyDaily:
+        [string appendString:@"FREQ=DAILY;"];
+        break;
+        case EKRecurrenceFrequencyWeekly:
+        [string appendString:@"FREQ=WEEKLY;"];
+        break;
+        case EKRecurrenceFrequencyMonthly:
+        [string appendString:@"FREQ=MONTHLY;"];
+        break;
+        case EKRecurrenceFrequencyYearly:
+        [string appendString:@"FREQ=YEARLY;"];
+        break;
+        default:
+        break;
+    }
+    
+    // Interval:
+    if (interval > 0) {
+        [string appendFormat:@"FREQ=%li;", (long)interval];
+    }
+
+    if (daysOfTheWeek && daysOfTheWeek.count) {
+        
+        [string appendString:@"BYDAY="];
+        
+        int i = 0;
+        
+        for (EKRecurrenceDayOfWeek *dayOfTheWeek in daysOfTheWeek) {
+            
+            NSInteger dayOfWeek = dayOfTheWeek.dayOfTheWeek;
+            
+            if (i > 0) {
+                [string appendString:@","];
+            }
+            
+            switch (dayOfWeek) {
+                case EKSunday:
+                [string appendString:@"SU"];
+                break;
+                case EKMonday:
+                [string appendString:@"MO"];
+                break;
+                case EKTuesday:
+                [string appendString:@"TU"];
+                break;
+                case EKWednesday:
+                [string appendString:@"WE"];
+                break;
+                case EKThursday:
+                [string appendString:@"TH"];
+                break;
+                case EKFriday:
+                [string appendString:@"FR"];
+                break;
+                case EKSaturday:
+                [string appendString:@"SA"];
+                break;
+            }
+            
+            // TODO: Add weekNumber support!
+            NSInteger weekNumber = dayOfTheWeek.weekNumber;
+            
+            
+            i++;
+        }
+        
+        [string appendString:@";"];
+    }
+    
+    
+    // Days of the month
+    if (daysOfTheMonth && daysOfTheMonth.count) {
+        
+        [string appendString:@"BYMONTHDAY="];
+        
+        int i = 0;
+        
+        for (NSNumber *dayNr in daysOfTheMonth) {
+            
+            
+            if (i > 0) {
+                [string appendString:@","];
+            }
+            
+            [string appendString:[NSString stringWithFormat:@"%li", (long)[dayNr integerValue]]];
+            
+            i++;
+        }
+        
+        [string appendString:@";"];
+    }
+    
+    // Months of the year
+    if (monthsOfTheYear && monthsOfTheYear.count) {
+        
+        [string appendString:@"BYMONTH="];
+        
+        int i = 0;
+        
+        for (NSNumber *monthNr in monthsOfTheYear) {
+            
+            
+            if (i > 0) {
+                [string appendString:@","];
+            }
+            
+            [string appendString:[NSString stringWithFormat:@"%li", (long)[monthNr integerValue]]];
+            
+            i++;
+        }
+        
+        [string appendString:@";"];
+    }
+    
+    // Weeks of the year
+    if (weeksOfTheYear && weeksOfTheYear.count) {
+        
+        [string appendString:@"BYWEEKNO="];
+        
+        int i = 0;
+        
+        for (NSNumber *weekNr in weeksOfTheYear) {
+            
+            
+            if (i > 0) {
+                [string appendString:@","];
+            }
+            
+            [string appendString:[NSString stringWithFormat:@"%li", (long)[weekNr integerValue]]];
+            
+            i++;
+        }
+        
+        [string appendString:@";"];
+    }
+
+        
+    // Days of the year
+    if (daysOfTheYear && daysOfTheYear.count) {
+        
+        [string appendString:@"BYYEARDAY="];
+        
+        int i = 0;
+        
+        for (NSNumber *dayNr in daysOfTheYear) {
+            
+            
+            if (i > 0) {
+                [string appendString:@","];
+            }
+            
+            [string appendString:[NSString stringWithFormat:@"%li", (long)[dayNr integerValue]]];
+            
+            i++;
+        }
+        
+        [string appendString:@";"];
+    }
+    
+        // Set positions
+    if (setPositions && setPositions.count) {
+        
+        [string appendString:@"BYYEARDAY="];
+        
+        int i = 0;
+        
+        for (NSNumber *positionNr in setPositions) {
+            
+            
+            if (i > 0) {
+                [string appendString:@","];
+            }
+            
+            [string appendString:[NSString stringWithFormat:@"%li", (long)[positionNr integerValue]]];
+            
+            i++;
+        }
+        
+        [string appendString:@";"];
+    }
+    
+    
+    if (recurrenceEnd) {
+        
+        if (recurrenceEnd.occurrenceCount) {
+         
+            [string appendFormat:@"COUNT=%lu", (unsigned long)recurrenceEnd.occurrenceCount];
+        }else if (recurrenceEnd.endDate){
+        
+            [string appendFormat:@"UNTIL=%@", [dateFormatter stringFromDate:recurrenceEnd.endDate]];
+        }
+    }
+
+    return string;
+
+
 }
 
 @end
