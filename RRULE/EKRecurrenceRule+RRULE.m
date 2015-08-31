@@ -209,7 +209,7 @@ static NSDateFormatter *dateFormatter = nil;
     
     // Interval:
     if (interval > 0) {
-        [string appendFormat:@"FREQ=%li;", (long)interval];
+        [string appendFormat:@"INTERVAL=%li;", (long)interval];
     }
 
     if (daysOfTheWeek && daysOfTheWeek.count) {
@@ -381,10 +381,10 @@ static NSDateFormatter *dateFormatter = nil;
         
         if (recurrenceEnd.occurrenceCount) {
          
-            [string appendFormat:@"COUNT=%lu", (unsigned long)recurrenceEnd.occurrenceCount];
+            [string appendFormat:@"COUNT=%lu;", (unsigned long)recurrenceEnd.occurrenceCount];
         }else if (recurrenceEnd.endDate){
         
-            [string appendFormat:@"UNTIL=%@", [dateFormatter stringFromDate:recurrenceEnd.endDate]];
+            [string appendFormat:@"UNTIL=%@;", [dateFormatter stringFromDate:recurrenceEnd.endDate]];
         }
     }
 
