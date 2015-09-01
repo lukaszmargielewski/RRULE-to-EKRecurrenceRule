@@ -7,17 +7,41 @@
 //
 
 #import "EKRecurrenceRule+RRULE.h"
+#import <objc/runtime.h>
 
+static NSDate *_startDateAAAA;
+static NSDate *_endDateAAAA;
 static NSDateFormatter *dateFormatter = nil;
-static NSDateFormatter *dateFormatterStart = nil;
 
 
 @implementation EKRecurrenceRule (RRULE)
 
+- (NSDate *)startDate{
+    
+    return objc_getAssociatedObject(self, &_startDateAAAA);
+}
+
+- (void) setStartDate:(NSDate *)startDate{
+    
+    objc_setAssociatedObject(self, &_startDateAAAA,
+                             startDate, OBJC_ASSOCIATION_RETAIN);
+}
+
+- (NSDate *)endDate{
+    
+    return objc_getAssociatedObject(self, &_endDateAAAA);
+}
+
+- (void)setEndDate:(NSDate *)endDate{
+    
+    objc_setAssociatedObject(self, &_endDateAAAA,
+                             endDate, OBJC_ASSOCIATION_RETAIN);
+}
+
 
 - (EKRecurrenceRule *)initWithString:(NSString *)rfc2445String
 {
-    return [self initWithString:rfc2445String andParseMore:NO];
+    return [self initWithString:rfc2445String andParseMore:YES];
 }
 
 - (EKRecurrenceRule *)initWithString:(NSString *)rfc2445String andParseMore:(BOOL)more
@@ -186,6 +210,7 @@ static NSDateFormatter *dateFormatterStart = nil;
 }
 
 - (NSString *)rfc2445String{
+   
     // If the date formatter isn't already set up, create it and cache it for reuse.
     if (dateFormatter == nil)
     {
@@ -193,7 +218,7 @@ static NSDateFormatter *dateFormatterStart = nil;
         NSLocale *enUSPOSIXLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
         
         [dateFormatter setLocale:enUSPOSIXLocale];
-        [dateFormatter setDateFormat:@"yyyyMMdd'T'HHmmss'Z'"];
+        [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSXXX"];
         [dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
     }
     
@@ -414,17 +439,9 @@ static NSDateFormatter *dateFormatterStart = nil;
 
     if (self.startDate)
     {
+
         
-        if (!dateFormatterStart) {
-            NSLocale *enUSPOSIXLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-            dateFormatterStart = [[NSDateFormatter alloc] init];
-            [dateFormatterStart setLocale:enUSPOSIXLocale];
-            [dateFormatterStart setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSXXX"];
-            [dateFormatterStart setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-        }
-        
-        
-        [string appendFormat:@"DTSTART=%@;", [dateFormatterStart stringFromDate:recurrenceEnd.endDate]];
+        [string appendFormat:@"DTSTART=%@;", [dateFormatter stringFromDate:recurrenceEnd.endDate]];
     }
     
     return string;
