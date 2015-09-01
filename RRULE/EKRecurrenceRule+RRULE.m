@@ -225,6 +225,30 @@ static NSDateFormatter *dateFormatter = nil;
 
     NSMutableString *string = [[NSMutableString alloc] initWithCapacity:200];
     
+    
+    EKRecurrenceEnd *recurrenceEnd  = self.recurrenceEnd;
+    
+    if (self.startDate)
+    {
+        
+        
+        [string appendFormat:@"DTSTART=%@;", [dateFormatter stringFromDate:self.startDate]];
+    }
+    
+    if (recurrenceEnd || self.endDate) {
+        
+        if (recurrenceEnd && recurrenceEnd.occurrenceCount) {
+            
+            [string appendFormat:@"COUNT=%lu;", (unsigned long)recurrenceEnd.occurrenceCount];
+            
+        }else if (recurrenceEnd.endDate || self.endDate){
+            
+            NSDate *endDate = recurrenceEnd.endDate ? recurrenceEnd.endDate : self.endDate;
+            [string appendFormat:@"UNTIL=%@;", [dateFormatter stringFromDate:endDate]];
+        }
+    }
+    
+    
     EKRecurrenceFrequency frequency = self.frequency;
     NSInteger interval              = self.interval;
     NSArray *daysOfTheWeek   = self.daysOfTheWeek;
@@ -234,7 +258,7 @@ static NSDateFormatter *dateFormatter = nil;
     NSArray *weeksOfTheYear  = self.weeksOfTheYear;
     NSArray *setPositions    = self.setPositions;
     
-    EKRecurrenceEnd *recurrenceEnd  = self.recurrenceEnd;
+    
     
     // Frequency:
     switch (frequency) {
@@ -422,27 +446,8 @@ static NSDateFormatter *dateFormatter = nil;
         
         [string appendString:@";"];
     }
-    
-    
-    if (recurrenceEnd || self.endDate) {
-        
-        if (recurrenceEnd && recurrenceEnd.occurrenceCount) {
-         
-            [string appendFormat:@"COUNT=%lu;", (unsigned long)recurrenceEnd.occurrenceCount];
-            
-        }else if (recurrenceEnd.endDate || self.endDate){
-        
-            NSDate *endDate = recurrenceEnd.endDate ? recurrenceEnd.endDate : self.endDate;
-            [string appendFormat:@"UNTIL=%@;", [dateFormatter stringFromDate:endDate]];
-        }
-    }
 
-    if (self.startDate)
-    {
-
-        
-        [string appendFormat:@"DTSTART=%@;", [dateFormatter stringFromDate:recurrenceEnd.endDate]];
-    }
+   
     
     return string;
 
