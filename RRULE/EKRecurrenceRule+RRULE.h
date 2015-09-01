@@ -14,7 +14,12 @@
 // - EKRecurrenceRule does add WKST=SU automatically
 // - EKRecurrenceRule does only support DAILY, WEEKLY, MONTHLY, YEARLY frequencies
 
+@property (strong, nonatomic) NSDate* endDate;
+@property (strong, nonatomic) NSDate* startDate;
+
 - (EKRecurrenceRule *)initWithString:(NSString *)rfc2445String;
 - (NSString *)rfc2445String;
+
+- (EKEvent*)eventWithRecurrenceRuleFromString:(NSString*)rfc2445String;
 
 @end
