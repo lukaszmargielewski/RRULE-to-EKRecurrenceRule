@@ -20,6 +20,9 @@
 - (EKRecurrenceRule *)initWithString:(NSString *)rfc2445String;
 - (NSString *)rfc2445String;
 
++ (NSString *)shortLabelFromEKRecurrenceRule:(EKRecurrenceRule *)recurrenceRule;
++ (NSString *)shortLabelFromRRule:(NSString *)rrule;
+
 - (EKEvent*)eventWithRecurrenceRuleFromString:(NSString*)rfc2445String;
 
 @end

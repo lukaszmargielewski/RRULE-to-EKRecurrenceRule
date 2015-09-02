@@ -44,8 +44,7 @@ static NSDateFormatter *dateFormatter = nil;
     return [self initWithString:rfc2445String andParseMore:YES];
 }
 
-- (EKRecurrenceRule *)initWithString:(NSString *)rfc2445String andParseMore:(BOOL)more
-{
+- (EKRecurrenceRule *)initWithString:(NSString *)rfc2445String andParseMore:(BOOL)more{
     // If the date formatter isn't already set up, create it and cache it for reuse.
     if (dateFormatter == nil)
     {
@@ -208,6 +207,28 @@ static NSDateFormatter *dateFormatter = nil;
                                                     setPositions:setPositions
                                                              end:recurrenceEnd];
 }
+
++ (NSString *)shortLabelFromRRule:(NSString *)rrule{
+
+    if (!rrule) {
+        return NSLocalizedString(@"Never", @"");
+    }
+    
+        // TODO: Implement labeling here...
+    
+    return rrule;
+}
++ (NSString *)shortLabelFromEKRecurrenceRule:(EKRecurrenceRule *)recurrenceRule{
+    
+    if (!recurrenceRule) {
+        return NSLocalizedString(@"Never", @"");
+    }
+    
+    NSString *rrule = [recurrenceRule rfc2445String];
+    return [EKRecurrenceRule shortLabelFromRRule:rrule];
+    
+}
+
 
 - (NSString *)rfc2445String{
    
