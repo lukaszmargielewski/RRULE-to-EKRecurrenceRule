@@ -296,7 +296,7 @@ static NSDateFormatter *dateFormatter = nil;
         
         [string appendString:@", "];
         NSString *format = occurenceCount == 1 ? NSLocalizedString(@"%i gentangelse", @"") : NSLocalizedString(@"%i gentangelser", @"");
-        [string appendFormat:format, interval];
+        [string appendFormat:format, occurenceCount];
     
     }else if (endDate){
     
