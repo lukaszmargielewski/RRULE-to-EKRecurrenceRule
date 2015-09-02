@@ -46,15 +46,7 @@ static NSDateFormatter *dateFormatter = nil;
 
 - (EKRecurrenceRule *)initWithString:(NSString *)rfc2445String andParseMore:(BOOL)more{
     // If the date formatter isn't already set up, create it and cache it for reuse.
-    if (dateFormatter == nil)
-    {
-        dateFormatter = [[NSDateFormatter alloc] init];
-        NSLocale *enUSPOSIXLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-        
-        [dateFormatter setLocale:enUSPOSIXLocale];
-        [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSXXX"];
-        [dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-    }
+    [self createDefaultDateFormatterIfNeeded];
     
     // Begin parsing
     NSArray *components = [rfc2445String.uppercaseString componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@";="]];
@@ -211,27 +203,120 @@ static NSDateFormatter *dateFormatter = nil;
 + (NSString *)shortLabelFromRRule:(NSString *)rrule{
 
     if (!rrule) {
-        return NSLocalizedString(@"Never", @"");
+        return NSLocalizedString(@"Will not repeat", @"");
     }
     
         // TODO: Implement labeling here...
     
-    return rrule;
+    // Begin parsing
+    NSArray *components = [rrule componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@";="]];
+    
+    NSMutableString *string = [[NSMutableString alloc] initWithCapacity:200];
+    
+    
+    NSInteger  frequency = -1;
+    NSInteger interval = -1;
+    NSInteger occurenceCount = -1;
+    NSDate *endDate = nil;
+    
+    for (int i = 0; i < components.count; i++)
+    {
+        NSString *component = [components objectAtIndex:i];
+        
+        // Frequency
+        if ([component isEqualToString:@"FREQ"])
+        {
+            NSString *frequencyString = [components objectAtIndex:++i];
+            
+            if      ([frequencyString isEqualToString:@"DAILY"])   frequency = EKRecurrenceFrequencyDaily;
+            else if ([frequencyString isEqualToString:@"WEEKLY"])  frequency = EKRecurrenceFrequencyWeekly;
+            else if ([frequencyString isEqualToString:@"MONTHLY"]) frequency = EKRecurrenceFrequencyMonthly;
+            else if ([frequencyString isEqualToString:@"YEARLY"])  frequency = EKRecurrenceFrequencyYearly;
+        }
+        
+        // Interval
+        else if ([component isEqualToString:@"INTERVAL"])
+        {
+            interval = [[components objectAtIndex:++i] intValue];
+        }
+
+        
+        // RecurrenceEnd
+        else if ([component isEqualToString:@"COUNT"])
+        {
+            occurenceCount = [[components objectAtIndex:++i] intValue];
+
+            
+        }
+        else if ([component isEqualToString:@"UNTIL"])
+        {
+            endDate =  [dateFormatter dateFromString:[components objectAtIndex:++i]];
+            
+        }
+    
+    }
+    
+    if (frequency > -1 && interval > 0) {
+        
+        [string appendString:NSLocalizedString(@"Every ", @"")];
+        
+        switch (frequency) {
+            case EKRecurrenceFrequencyDaily:
+            {
+                NSString *format = interval == 1 ? NSLocalizedString(@"%i dag", @"") : NSLocalizedString(@"%i dage", @"");
+                [string appendFormat:format, interval];
+            }
+                break;
+            case EKRecurrenceFrequencyWeekly:
+            {
+                NSString *format = interval == 1 ? NSLocalizedString(@"%i uge", @"") : NSLocalizedString(@"%i uger", @"");
+                [string appendFormat:format, interval];
+            }
+                break;
+            case EKRecurrenceFrequencyMonthly:
+            {
+                NSString *format = interval == 1 ? NSLocalizedString(@"%i måned", @"") : NSLocalizedString(@"%i måneder", @"");
+                [string appendFormat:format, interval];
+            }
+                break;
+                
+            case EKRecurrenceFrequencyYearly:
+            {
+                NSString *format = interval == 1 ? NSLocalizedString(@"%i år", @"") : NSLocalizedString(@"%i åre", @"");
+                [string appendFormat:format, interval];
+            }
+                break;
+                
+            default:
+                break;
+        }
+    }
+    
+    if (occurenceCount > 0) {
+        
+        [string appendString:@", "];
+        NSString *format = interval == 1 ? NSLocalizedString(@"%i gentangelse", @"") : NSLocalizedString(@"%i gentangelser", @"");
+        [string appendFormat:format, interval];
+    
+    }else if (endDate){
+    
+        [string appendString:NSLocalizedString(@", until", @"")];
+        NSDateFormatter *df= [[NSDateFormatter alloc] init];
+        df.dateFormat = @"d. MM yyyy";
+        [string appendString:[df stringFromDate:endDate]];
+    }
+    
+    return string;
 }
 + (NSString *)shortLabelFromEKRecurrenceRule:(EKRecurrenceRule *)recurrenceRule{
-    
-    if (!recurrenceRule) {
-        return NSLocalizedString(@"Never", @"");
-    }
     
     NSString *rrule = [recurrenceRule rfc2445String];
     return [EKRecurrenceRule shortLabelFromRRule:rrule];
     
 }
 
+- (void)createDefaultDateFormatterIfNeeded{
 
-- (NSString *)rfc2445String{
-   
     // If the date formatter isn't already set up, create it and cache it for reuse.
     if (dateFormatter == nil)
     {
@@ -242,6 +327,11 @@ static NSDateFormatter *dateFormatter = nil;
         [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSXXX"];
         [dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
     }
+}
+
+- (NSString *)rfc2445String{
+   
+    [self createDefaultDateFormatterIfNeeded];
     
 
     NSMutableString *string = [[NSMutableString alloc] initWithCapacity:200];
