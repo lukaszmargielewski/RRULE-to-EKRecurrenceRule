@@ -263,26 +263,26 @@ static NSDateFormatter *dateFormatter = nil;
         switch (frequency) {
             case EKRecurrenceFrequencyDaily:
             {
-                NSString *format = interval == 1 ? NSLocalizedString(@"%i dag", @"") : NSLocalizedString(@"%i dage", @"");
+                NSString *format = interval == 1 ? NSLocalizedString(@"dag", @"") : NSLocalizedString(@"%i dage", @"");
                 [string appendFormat:format, interval];
             }
                 break;
             case EKRecurrenceFrequencyWeekly:
             {
-                NSString *format = interval == 1 ? NSLocalizedString(@"%i uge", @"") : NSLocalizedString(@"%i uger", @"");
+                NSString *format = interval == 1 ? NSLocalizedString(@"uge", @"") : NSLocalizedString(@"%i uger", @"");
                 [string appendFormat:format, interval];
             }
                 break;
             case EKRecurrenceFrequencyMonthly:
             {
-                NSString *format = interval == 1 ? NSLocalizedString(@"%i måned", @"") : NSLocalizedString(@"%i måneder", @"");
+                NSString *format = interval == 1 ? NSLocalizedString(@"%måned", @"") : NSLocalizedString(@"%i måneder", @"");
                 [string appendFormat:format, interval];
             }
                 break;
                 
             case EKRecurrenceFrequencyYearly:
             {
-                NSString *format = interval == 1 ? NSLocalizedString(@"%i år", @"") : NSLocalizedString(@"%i åre", @"");
+                NSString *format = interval == 1 ? NSLocalizedString(@"år", @"") : NSLocalizedString(@"%i åre", @"");
                 [string appendFormat:format, interval];
             }
                 break;
@@ -295,7 +295,7 @@ static NSDateFormatter *dateFormatter = nil;
     if (occurenceCount > 0) {
         
         [string appendString:@", "];
-        NSString *format = occurenceCount == 1 ? NSLocalizedString(@"%i gentangelse", @"") : NSLocalizedString(@"%i gentangelser", @"");
+        NSString *format = occurenceCount == 1 ? NSLocalizedString(@"%i gentagelse", @"") : NSLocalizedString(@"%i gentagelser", @"");
         [string appendFormat:format, occurenceCount];
     
     }else if (endDate){
