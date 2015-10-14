@@ -263,26 +263,26 @@ static NSDateFormatter *dateFormatter = nil;
         switch (frequency) {
             case EKRecurrenceFrequencyDaily:
             {
-                NSString *format = interval == 1 ? NSLocalizedString(@"dag", @"") : NSLocalizedString(@"%i dage", @"");
+                NSString *format = interval == 1 ? NSLocalizedString(@"dag", @"") : NSLocalizedString(@"%i. dag", @"");
                 [string appendFormat:format, interval];
             }
                 break;
             case EKRecurrenceFrequencyWeekly:
             {
-                NSString *format = interval == 1 ? NSLocalizedString(@"uge", @"") : NSLocalizedString(@"%i uger", @"");
+                NSString *format = interval == 1 ? NSLocalizedString(@"uge", @"") : NSLocalizedString(@"%i. uge", @"");
                 [string appendFormat:format, interval];
             }
                 break;
             case EKRecurrenceFrequencyMonthly:
             {
-                NSString *format = interval == 1 ? NSLocalizedString(@"%måned", @"") : NSLocalizedString(@"%i måneder", @"");
+                NSString *format = interval == 1 ? NSLocalizedString(@"%måned", @"") : NSLocalizedString(@"%i. måned", @"");
                 [string appendFormat:format, interval];
             }
                 break;
                 
             case EKRecurrenceFrequencyYearly:
             {
-                NSString *format = interval == 1 ? NSLocalizedString(@"år", @"") : NSLocalizedString(@"%i åre", @"");
+                NSString *format = interval == 1 ? NSLocalizedString(@"år", @"") : NSLocalizedString(@"%i. åre", @"");
                 [string appendFormat:format, interval];
             }
                 break;
