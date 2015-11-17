@@ -300,7 +300,7 @@ static NSDateFormatter *dateFormatter = nil;
     
     }else if (endDate){
     
-        [string appendString:NSLocalizedString(@", until", @"")];
+        [string appendString:NSLocalizedString(@", until ", @"")];
         NSDateFormatter *df= [[NSDateFormatter alloc] init];
         df.dateFormat = @"d. MM yyyy";
         [string appendString:[df stringFromDate:endDate]];
