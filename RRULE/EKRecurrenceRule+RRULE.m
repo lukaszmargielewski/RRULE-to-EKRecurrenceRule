@@ -45,12 +45,20 @@ static NSDateFormatter *dateFormatter = nil;
 }
 
 - (EKRecurrenceRule *)initWithString:(NSString *)rfc2445String andParseMore:(BOOL)more{
-    // If the date formatter isn't already set up, create it and cache it for reuse.
-    [self createDefaultDateFormatterIfNeeded];
     
+    if (!rfc2445String || !rfc2445String.length) {
+        return nil;
+    }
     // Begin parsing
     NSArray *components = [rfc2445String.uppercaseString componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@";="]];
+    
+    if (!components || !components.count) {
+        return nil;
+    }
+    // If the date formatter isn't already set up, create it and cache it for reuse.
+    [self createDefaultDateFormatterIfNeeded];
 
+    
     EKRecurrenceFrequency frequency = EKRecurrenceFrequencyDaily;
     NSInteger interval              = 1;
     NSMutableArray *daysOfTheWeek   = nil;
