@@ -7,4 +7,6 @@ s.platform = :ios
 s.source   = { :git => 'https://github.com/lukaszmargielewski/RRULE-to-EKRecurrenceRule.git', :tag => s.version.to_s }
 s.source_files = 'EKRecurrenceRuleRRULE/*.{h,m}'
 s.requires_arc = true
+s.authors = 'Jochen Schöllig'
+s.summary = 'Temporary summary'
 end
